@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LeafAI — Tomato Disease Detector</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <div class="bg-wrap">
+    <img class="bg-img"
+      src="https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?w=1920&q=95&auto=format&fit=crop"
+      alt=""
+      onerror="this.src='https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1920&q=90'" />
+    <div class="bg-tint"></div>
+  </div>
+
+  <nav class="nav">
+    <div class="nav-left">
+      <div class="nav-menu"><span></span><span></span><span></span></div>
+      <span class="nav-title">TOMATO LEAF PATHOLOGY · LEAFAI v2.1</span>
+    </div>
+    <div class="nav-right">
+      <span class="status-dot"></span>
+      <span class="nav-model">MODEL ACTIVE · MobileNetV2</span>
+    </div>
+  </nav>
+
+  <div class="hero-tagline">
+    <h1>Detect<br><em>Disease</em></h1>
+    <p class="hero-sub">AI-powered plant<br>pathology at a glance</p>
+  </div>
+
+  <div class="glass-card" id="mainCard">
+
+    <div class="card-left">
+      <div class="thumb-zone" id="thumbZone">
+        <div class="thumb-placeholder" id="thumbPlaceholder">
+          <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+            <circle cx="18" cy="18" r="16" stroke="rgba(255,255,255,0.5)" stroke-width="1.2"/>
+            <path d="M18 7C12 7 9 12 9 16C9 21 12 27 18 27C24 27 27 21 27 16C27 11 23 7 18 7Z" stroke="rgba(255,255,255,0.8)" stroke-width="1.3" fill="none"/>
+            <path d="M18 27V9" stroke="white" stroke-width="1.6" stroke-linecap="round"/>
+            <path d="M18 20C18 20 13 17 11 14" stroke="white" stroke-width="1.2" stroke-linecap="round" opacity="0.8"/>
+            <path d="M18 23C18 23 23 20 25 17" stroke="white" stroke-width="1.2" stroke-linecap="round" opacity="0.8"/>
+          </svg>
+          <span>Click to upload</span>
+          <span class="thumb-hint">JPG · PNG · WEBP</span>
+        </div>
+        <img id="thumbImg" class="thumb-img" alt="" />
+        <input type="file" id="fileInput" hidden accept="image/*" />
+      </div>
+      <div class="card-left-meta">
+        <p class="meta-label">Architecture</p>
+        <p class="meta-value">MobileNetV2<br>+ Gemini 1.5 Pro</p>
+        <div class="meta-divider"></div>
+        <p class="meta-label">Training Data</p>
+        <p class="meta-stat">54,000+</p>
+        <p class="meta-stat-label">labelled images</p>
+        <div class="meta-divider"></div>
+        <div class="meta-tags">
+          <span class="tag">CNN</span>
+          <span class="tag">38 Classes</span>
+          <span class="tag">PlantVillage</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-right">
+
+      <div id="stateUpload" class="state">
+        <div class="card-eyebrow">AI PLANT PATHOLOGY SYSTEM</div>
+        <h2 class="card-title">Tomato Leaf<br>Diagnosis</h2>
+        <p class="card-body">
+          LeafAI uses a fine-tuned <strong>MobileNetV2</strong> convolutional neural network trained on the <strong>PlantVillage dataset</strong> to identify diseases across <strong>38 distinct classes</strong> — from Early Blight and Late Blight to Septoria Leaf Spot and Yellow Leaf Curl Virus. After classification, <strong>Gemini 1.5 Pro</strong> generates a personalised treatment advisory with actionable steps.
+        </p>
+        <div class="info-grid">
+          <div class="info-cell">
+            <span class="info-num">38</span>
+            <span class="info-desc">Disease classes</span>
+          </div>
+          <div class="info-cell">
+            <span class="info-num">96%</span>
+            <span class="info-desc">Val. accuracy</span>
+          </div>
+          <div class="info-cell">
+            <span class="info-num">&lt;2s</span>
+            <span class="info-desc">Inference time</span>
+          </div>
+        </div>
+        <div class="card-actions">
+          <button class="btn-primary" id="uploadBtn">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v8M7 1L4 4M7 1l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M1 10v1.5A1.5 1.5 0 002.5 13h9a1.5 1.5 0 001.5-1.5V10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            Upload Specimen
+          </button>
+          <button class="btn-secondary" id="analyzeBtn" disabled>Run Analysis →</button>
+        </div>
+        <div class="bottom-tags">
+          <span class="chip">PlantVillage Dataset</span>
+          <span class="chip">Educational Use Only</span>
+          <span class="chip">Not a clinical substitute</span>
+        </div>
+      </div>
+
+      <div id="stateAnalyzing" class="state hidden">
+        <div class="analyzing-wrap">
+          <div class="spinner-ring"><div class="spinner-arc"></div></div>
+          <h2 class="card-title" style="margin-top:26px">Analyzing<br>Specimen…</h2>
+          <p class="card-body">Running CNN inference through <strong>MobileNetV2</strong>. Your image is being classified across 38 disease categories. Gemini AI will then generate a tailored treatment advisory.</p>
+          <div class="analyzing-steps">
+            <div class="step step-active">① Preprocessing image tensor</div>
+            <div class="step">② CNN feature extraction</div>
+            <div class="step">③ Gemini advisory generation</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="stateResult" class="state hidden">
+        <div class="result-top-row">
+          <span class="diag-label">DIAGNOSIS REPORT · LEAFAI v2.1</span>
+          <span class="conf-badge" id="confBadge">—</span>
+        </div>
+        <h2 class="result-disease" id="diseaseName">—</h2>
+        <div class="conf-block">
+          <div class="conf-header">
+            <span class="conf-title">Model Confidence Score</span>
+            <span class="conf-pct" id="confPct">—</span>
+          </div>
+          <div class="conf-track">
+            <div class="conf-fill" id="confFill"></div>
+            <div class="conf-shine"></div>
+          </div>
+          <p class="conf-note">Reflects the model's certainty based on visual feature matching against the PlantVillage training corpus.</p>
+        </div>
+        <div class="advisory-wrap">
+          <p class="adv-label">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="4" stroke="currentColor" stroke-width="1"/><path d="M5 3v2.5" stroke="currentColor" stroke-width="1" stroke-linecap="round"/><circle cx="5" cy="7.5" r="0.4" fill="currentColor"/></svg>
+            TREATMENT ADVISORY · GEMINI 1.5 PRO
+          </p>
+          <div id="advisoryBody" class="adv-body"></div>
+        </div>
+        <button class="btn-reset" id="resetBtn">← Analyze Another Specimen</button>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="footer-strip">
+    <span>LeafAI © 2025 — Educational research tool</span>
+    <span>CNN · MobileNetV2 · PlantVillage · 38 classes · Gemini AI</span>
+    <span>Not a substitute for professional agronomic advice</span>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
