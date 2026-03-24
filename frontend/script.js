@@ -1,76 +1,50 @@
-// ─────────────────────────────────────────────────────────
-//  LeafAI · Frontend Script
-//  State machine: Upload → Analyzing → Result
-//  Backend: POST http://127.0.0.1:5000/predict
-// ─────────────────────────────────────────────────────────
-
 const BACKEND_URL = '';
-
-// ── Element refs ──────────────────────────────────────────
 const fileInput        = document.getElementById('fileInput');
 const analyzeBtn       = document.getElementById('analyzeBtn');
 const thumbImg         = document.getElementById('thumbImg');
 const thumbPlaceholder = document.getElementById('thumbPlaceholder');
-
 const stateUpload    = document.getElementById('stateUpload');
 const stateAnalyzing = document.getElementById('stateAnalyzing');
 const stateResult    = document.getElementById('stateResult');
-
 const diseaseNameEl  = document.getElementById('diseaseName');
 const confBadgeEl    = document.getElementById('confBadge');
 const confFillEl     = document.getElementById('confFill');
 const confPctEl      = document.getElementById('confPct');
 const advisoryBodyEl = document.getElementById('advisoryBody');
-
-// ── Added: Top 3 element ──
 const top3ListEl = document.createElement('div');
 top3ListEl.className = 'top3-list';
 confPctEl.parentElement.after(top3ListEl);
-
-// ── State switcher ────────────────────────────────────────
 function showState(name) {
   stateUpload   .classList.add('hidden');
   stateAnalyzing.classList.add('hidden');
   stateResult   .classList.add('hidden');
-  
   const target = document.getElementById('state' + name);
   target.classList.remove('hidden');
   target.style.animation = 'fadeIn 0.5s ease-out both';
 }
-
-// ── Analyze ───────────────────────────────────────────────
 async function analyze() {
   const file = fileInput.files[0];
   if (!file) return;
-
   showState('Analyzing');
-
   const formData = new FormData();
   formData.append('file', file);
-
   try {
     const res = await fetch(`${BACKEND_URL}/predict`, {
       method: 'POST',
       body: formData,
     });
-
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Backend error');
-
     const disease    = data.disease    || 'Unknown';
     const confidence = parseFloat(data.confidence) || 0;
     const advisory   = data.gist || data.advisory || 'No advisory available.';
     const top3       = data.top3 || [];
-
     diseaseNameEl.textContent = disease;
     confBadgeEl.textContent   = confidence + '%';
     confPctEl.textContent     = confidence + '%';
-
     renderTop3(top3);
     renderAdvisory(advisory);
-
     showState('Result');
-
     requestAnimationFrame(() => {
       setTimeout(() => {
          confFillEl.style.width = confidence + '%';
@@ -83,8 +57,6 @@ async function analyze() {
     console.error(err);
   }
 }
-
-// ── Top 3 renderer ────────────────────────────────────────
 function renderTop3(list) {
   top3ListEl.innerHTML = '';
   list.forEach(item => {
@@ -98,14 +70,11 @@ function renderTop3(list) {
     top3ListEl.appendChild(div);
   });
 }
-
-// ── Advisory renderer ─────────────────────────────────────
 function renderAdvisory(text) {
   advisoryBodyEl.replaceChildren();
   const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
   if (!lines.length) lines.push('No advisory available.');
-
-  lines.forEach((line, i) => {
+   lines.forEach((line, i) => {
     const el = document.createElement('div');
     el.className = 'advisory-line';
     el.style.animationDelay = (i * 0.07) + 's';
@@ -113,29 +82,21 @@ function renderAdvisory(text) {
     advisoryBodyEl.appendChild(el);
   });
 }
-
-// ── Reset ─────────────────────────────────────────────────
 function resetUI() {
   fileInput.value = '';
-
   thumbImg.src = '';
   thumbImg.style.display = 'none';
   thumbPlaceholder.style.display = 'flex';
-
   confFillEl.style.transition = 'none';
   confFillEl.style.width = '0%';
   requestAnimationFrame(() => { confFillEl.style.transition = ''; });
-
   diseaseNameEl.textContent = '—';
   confBadgeEl.textContent   = '—';
   confPctEl.textContent     = '—';
   advisoryBodyEl.replaceChildren();
-
   analyzeBtn.disabled = true;
   showState('Upload');
 }
-
-// ── Button wiring ─────────────────────────────────────────
 fileInput.addEventListener('change', (e) => {
   const file = e.target.files[0];
   if (file) {
@@ -149,13 +110,10 @@ fileInput.addEventListener('change', (e) => {
     reader.readAsDataURL(file);
   }
 });
-
 analyzeBtn.addEventListener('click', analyze);
 document.getElementById('uploadBtn').addEventListener('click', () => fileInput.click());
 document.getElementById('thumbZone').addEventListener('click',  () => fileInput.click());
 document.getElementById('resetBtn').addEventListener('click', resetUI);
-
-// ── Parallax ──────────────────────────────────────────────
 document.addEventListener('mousemove', e => {
   const x = (e.clientX / window.innerWidth  - 0.5) * 14;
   const y = (e.clientY / window.innerHeight - 0.5) * 14;
